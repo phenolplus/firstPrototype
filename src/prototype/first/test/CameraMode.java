@@ -12,6 +12,7 @@ public class CameraMode extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mSurface = new DrawingSurface(this);
         setContentView(mSurface);
         
     }

@@ -8,6 +8,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.util.Log;
 
 public class FirstPrototypeActivity extends Activity {
     
@@ -15,7 +16,7 @@ public class FirstPrototypeActivity extends Activity {
 	private SensorManager manager;
 	private Sensor sensor;
 	private SensorEventListener listener;
-	private float pitch = 0;
+	private float roll = 0;
 	
 	
 	/** Called when the activity is first created. */
@@ -43,8 +44,9 @@ public class FirstPrototypeActivity extends Activity {
 				@Override
 				public void onSensorChanged(SensorEvent event) {
 					// TODO Auto-generated method stub
-					pitch = event.values[1];
-					if(pitch>45){
+					roll = event.values[2];
+					Log.e("========= Sensor Listener","Pitch = "+roll);
+					if(Math.abs(roll)>45){
 						Intent intent = new Intent();
 						intent.setClass(FirstPrototypeActivity.this, CameraMode.class);
 						startActivity(intent);
