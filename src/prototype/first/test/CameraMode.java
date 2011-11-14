@@ -17,9 +17,6 @@ public class CameraMode extends Activity {
 	private Sensor sensor = ContainerBox.topSensor;
 	private SensorEventListener listener;
 	
-	private float face,roll;
-	
-	
 	
 	/** Called when the activity is first created. */
     @Override
@@ -44,10 +41,9 @@ public class CameraMode extends Activity {
 			@Override
 			public void onSensorChanged(SensorEvent event) {
 				// TODO Auto-generated method stub
-				face = event.values[0];
-				roll = event.values[2];
-				Log.e("========== Sensors","roll = "+roll);
-				if(Math.abs(roll)<30)
+				mSurface.setCurrent(event.values);
+				Log.e("========== Sensors","roll = "+event.values[2]);
+				if(Math.abs(event.values[2])<30)
 					CameraMode.this.finish();
 			}
     		

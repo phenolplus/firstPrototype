@@ -9,8 +9,8 @@ import android.view.SurfaceHolder;
 public class DrawingSurface extends android.view.SurfaceView implements SurfaceHolder.Callback{
 
 	/** Members */
-	private float target;
-	private float current;
+	private float[] north = {0, 0, 90};
+	private float[] current = new float[3];
 	
 	
 	public DrawingSurface(Context context) {
@@ -25,7 +25,10 @@ public class DrawingSurface extends android.view.SurfaceView implements SurfaceH
 		Paint paint = new Paint();
 		paint.setColor(Color.BLUE);
 		paint.setAlpha(100);
-		canvas.drawCircle(150, 150, 30, paint);
+		float h,w;
+		h = canvas.getHeight();
+		w = canvas.getWidth();
+		canvas.drawCircle(w/2, h/2, 30, paint);
 	}
 
 	@Override
@@ -48,8 +51,12 @@ public class DrawingSurface extends android.view.SurfaceView implements SurfaceH
 	}
 	
 	/** Utilities */
-	public void setTarget(float direction){
+	public void setTarget(float[] direction){
 		
+	}
+	
+	public void setCurrent(float[] direction){
+		current = direction;
 	}
 	
 

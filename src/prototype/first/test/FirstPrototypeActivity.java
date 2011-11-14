@@ -16,7 +16,6 @@ public class FirstPrototypeActivity extends Activity {
 	private SensorManager manager;
 	private Sensor sensor;
 	private SensorEventListener listener;
-	private float roll = 0;
 	
 	
 	/** Called when the activity is first created. */
@@ -46,9 +45,8 @@ public class FirstPrototypeActivity extends Activity {
 				@Override
 				public void onSensorChanged(SensorEvent event) {
 					// TODO Auto-generated method stub
-					roll = event.values[2];
-					Log.e("========= Sensor Listener","Pitch = "+roll);
-					if(Math.abs(roll)>45){
+					Log.e("========= Sensor Listener","Pitch = "+event.values[2]);
+					if(Math.abs(event.values[2])>45){
 						Intent intent = new Intent();
 						intent.setClass(FirstPrototypeActivity.this, CameraMode.class);
 						startActivity(intent);
