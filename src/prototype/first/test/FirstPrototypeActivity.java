@@ -26,6 +26,8 @@ public class FirstPrototypeActivity extends Activity {
         setContentView(R.layout.main);
         manager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         sensor = manager.getDefaultSensor(Sensor.TYPE_ORIENTATION);
+        ContainerBox.topManager = manager;
+        ContainerBox.topSensor = sensor;
      
     }
     
