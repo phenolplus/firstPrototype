@@ -16,6 +16,7 @@ public class DrawingSurface extends android.view.SurfaceView implements SurfaceH
 	public DrawingSurface(Context context) {
 		super(context);
 		this.setWillNotDraw(false);
+		
 		// TODO Auto-generated constructor stub
 	}
 	
