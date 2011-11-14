@@ -2,6 +2,8 @@ package prototype.first.test;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.view.SurfaceHolder;
 
 public class DrawingSurface extends android.view.SurfaceView implements SurfaceHolder.Callback{
@@ -13,7 +15,9 @@ public class DrawingSurface extends android.view.SurfaceView implements SurfaceH
 	
 	@Override
 	public void onDraw(Canvas canvas){
-		
+		Paint paint = new Paint();
+		paint.setColor(Color.BLUE);
+		canvas.drawCircle(150, 150, 30, paint);
 	}
 
 	@Override
