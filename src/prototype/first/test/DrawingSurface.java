@@ -104,7 +104,7 @@ public class DrawingSurface extends android.view.SurfaceView implements SurfaceH
 					position[0] = (float) (Math.PI + Math.atan(x/y));
 				}
 				position[0] = (float) Math.toDegrees(position[0]);
-				position[1] = -70; // horizontal (default)
+				position[1] = -85; // horizontal (default)
 				Log.e("Import data","added position :"+position[0]);
 				targetList.add(position);
 			}
