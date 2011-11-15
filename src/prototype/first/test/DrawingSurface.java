@@ -72,12 +72,22 @@ public class DrawingSurface extends android.view.SurfaceView implements SurfaceH
 	}
 	
 	/** Importing data */
-	public void setCurrent(float[] direction){
+	public void setCurrentFace(float[] direction){
 		current = direction;
 	}
 	
-	public void importTargetList(){
+	public boolean importTargetList(String list){
+		// The LIST should have the form :
+		// Long:Lat!(next)!...
+		// longitude and latitude are relative
 		
+		String[] entries = list.split("!");
+		for(int i=0;i<entries.length;i++){
+			float[] position = new float[2];
+			targetList.add(position);
+		}
+		
+		return true;
 	}
 	
 	/** Utilities */

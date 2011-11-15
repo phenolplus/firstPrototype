@@ -41,7 +41,7 @@ public class CameraMode extends Activity {
 			@Override
 			public void onSensorChanged(SensorEvent event) {
 				// TODO Auto-generated method stub
-				mSurface.setCurrent(event.values);
+				mSurface.setCurrentFace(event.values);
 				Log.e("========== Sensors","roll = "+event.values[2]);
 				if(Math.abs(event.values[2])<30)
 					CameraMode.this.finish();
