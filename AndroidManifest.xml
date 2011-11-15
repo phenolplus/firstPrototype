@@ -6,7 +6,8 @@
 
     <uses-sdk android:minSdkVersion="8" />
     <uses-feature android:required="true" android:name="android.hardware.sensor.orientation"/>
-    <uses-feature android:required="true" android:name="android.hardware.camera"/>
+    <uses-permission android:name="android.permission.CAMERA" />
+ 	<uses-feature android:name="android.hardware.camera" android:required="true"/>
     
     <application
         android:icon="@drawable/camera_icon"

@@ -17,6 +17,8 @@ public class FirstPrototypeActivity extends Activity {
 	private Sensor sensor;
 	private SensorEventListener listener;
 	
+	private boolean called=false;
+	
 	
 	/** Called when the activity is first created. */
     @Override
@@ -45,16 +47,20 @@ public class FirstPrototypeActivity extends Activity {
 				@Override
 				public void onSensorChanged(SensorEvent event) {
 					// TODO Auto-generated method stub
-					Log.e("========= Sensor Listener","Pitch = "+event.values[2]);
-					if(Math.abs(event.values[2])>45){
+					
+					float para = event.values[1];
+					if(Math.abs(para)>45&&!called){
+						called = true;
 						Intent intent = new Intent();
 						intent.setClass(FirstPrototypeActivity.this, CameraMode.class);
 						startActivity(intent);
 					}
+					
 				}
         		
         	};
         	manager.registerListener(listener, sensor, SensorManager.SENSOR_DELAY_GAME);
+        	called = false;
         }
     }
     

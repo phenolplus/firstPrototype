@@ -17,10 +17,10 @@ public class DrawingSurface extends android.view.SurfaceView implements SurfaceH
 	private Camera camera;
 	private SurfaceHolder holder;
 	
-	private final float[] north = {0, 0, 90};
+	private final float[] north = {0, -90, 90};
 	private ArrayList<float[]> targetList = new ArrayList<float[]>();
 	private float[] current = new float[3];
-	private final float distance = 50;
+	private final float distance = 22;
 	
 	public DrawingSurface(Context context) {
 		super(context);
@@ -36,6 +36,7 @@ public class DrawingSurface extends android.view.SurfaceView implements SurfaceH
 	public void onDraw(Canvas canvas){
 		canvas = aquireNorth(canvas);
 		canvas = showTargets(canvas);
+		invalidate();
 	}
 
 	@Override
@@ -48,11 +49,11 @@ public class DrawingSurface extends android.view.SurfaceView implements SurfaceH
 	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
 		// TODO Auto-generated method stub
+		Log.e("Surface","   creating");
 		camera = Camera.open();
-		try {
-			camera.setPreviewDisplay(holder);
-		} catch (IOException exception) {
-			Log.e("IO Exception catch", "Did come into exception");
+		try{
+			camera.setPreviewDisplay(holder);	
+		} catch(IOException exp){
 			camera.release();
 			camera = null;
 		}
@@ -60,7 +61,7 @@ public class DrawingSurface extends android.view.SurfaceView implements SurfaceH
 		para.setPreviewSize(this.getWidth()/2, this.getHeight()/2);
 		camera.setParameters(para);
 		camera.startPreview();
-		
+		Log.e("Surface","   did created");
 	}
 
 	@Override
@@ -69,6 +70,8 @@ public class DrawingSurface extends android.view.SurfaceView implements SurfaceH
 		camera.stopPreview();
 		camera.release();
 		camera = null;
+		Log.e("Surface","   did destroyed");
+		
 	}
 	
 	/** Importing data */
@@ -95,7 +98,7 @@ public class DrawingSurface extends android.view.SurfaceView implements SurfaceH
 		float [] point = new float[2];
 		// point = [x,y] = [polar,roll]
 		
-		point[1] = north[2] - current[2];
+		point[1] = north[1] - current[1];
 		if(current[0]>180){
 			point[0] = north[0] - (current[0] - 360);
 			
@@ -119,6 +122,7 @@ public class DrawingSurface extends android.view.SurfaceView implements SurfaceH
 		paint.setColor(Color.WHITE);
 		canvas.drawText("N", x, y, paint);
 		
+		//Log.e("Canvas","update data @ x = "+x+"  "+"y = "+y);
 		return canvas;
 	}
 	
@@ -129,8 +133,8 @@ public class DrawingSurface extends android.view.SurfaceView implements SurfaceH
 		
 		float x,y;
 		for(int i=0;i<targetList.size();i++){
-			x = this.getWidth()/2 + targetList.get(i)[0];
-			y = this.getHeight()/2 + targetList.get(i)[1];
+			x = this.getWidth()/2 + targetList.get(i)[0]*distance;
+			y = this.getHeight()/2 + targetList.get(i)[1]*distance;
 			canvas.drawCircle(x, y, 30, paint);
 		}
 		return canvas;
