@@ -20,6 +20,7 @@ public class FirstPrototypeActivity extends Activity {
 	private boolean called=false;
 	
 	
+	
 	/** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -29,7 +30,7 @@ public class FirstPrototypeActivity extends Activity {
         sensor = manager.getDefaultSensor(Sensor.TYPE_ORIENTATION);
         ContainerBox.topManager = manager;
         ContainerBox.topSensor = sensor;
-     
+        
     }
     
     @Override

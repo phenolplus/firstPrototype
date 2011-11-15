@@ -20,7 +20,7 @@ public class DrawingSurface extends android.view.SurfaceView implements SurfaceH
 	private final float[] north = {0, -90, 90};
 	private ArrayList<float[]> targetList = new ArrayList<float[]>();
 	private float[] current = new float[3];
-	private final float distance = 30;
+	private final float distance = 35; // depends on device and hand
 	
 	public DrawingSurface(Context context) {
 		super(context);
@@ -81,13 +81,34 @@ public class DrawingSurface extends android.view.SurfaceView implements SurfaceH
 	
 	public boolean importTargetList(String list){
 		// The LIST should have the form :
-		// Long:Lat!(next)!...
+		// Lat:Long!(next)!...
 		// longitude and latitude are relative
 		
 		String[] entries = list.split("!");
+		if(entries.length==0){
+			return false;
+		}
+		
 		for(int i=0;i<entries.length;i++){
 			float[] position = new float[2];
-			targetList.add(position);
+			String[] data = entries[i].split(":");
+			if(data.length!=2){
+				return false;
+			} else {
+				float x,y;
+				x = Float.parseFloat(data[0]);
+				y = Float.parseFloat(data[1]);
+				if(y>0){
+					position[0] = (float) ((x>0)? Math.atan(x/y):(2*Math.PI + Math.atan(x/y)));
+				} else {
+					position[0] = (float) (Math.PI + Math.atan(x/y));
+				}
+				position[0] = (float) Math.toDegrees(position[0]);
+				position[1] = -70; // horizontal (default)
+				Log.e("Import data","added position :"+position[0]);
+				targetList.add(position);
+			}
+			
 		}
 		
 		return true;
@@ -127,15 +148,30 @@ public class DrawingSurface extends android.view.SurfaceView implements SurfaceH
 	}
 	
 	private Canvas showTargets(Canvas canvas){
-		Paint paint = new Paint();
-		paint.setAlpha(127);
-		paint.setColor(Color.RED);
+		Paint cPaint = new Paint();
+		cPaint.setAlpha(200);
+		cPaint.setColor(Color.RED);
+		
+		Paint tPaint = new Paint();
+		tPaint.setColor(Color.WHITE);
 		
 		float x,y;
+		float[] point = new float[2];
 		for(int i=0;i<targetList.size();i++){
-			x = this.getWidth()/2 + targetList.get(i)[0]*distance;
-			y = this.getHeight()/2 + targetList.get(i)[1]*distance;
-			canvas.drawCircle(x, y, 30, paint);
+			point[1] = targetList.get(i)[1] - current[1];
+			if(current[0]>180){
+				point[0] = targetList.get(i)[0] - (current[0] - 360);
+				
+			} else {
+				point[0] = targetList.get(i)[0] - current[0];
+				
+			}
+			point[0] = point[0]*distance;
+			point[1] = point[1]*distance;
+			x = this.getWidth()/2 + point[0];
+			y = this.getHeight()/2 + point[1];
+			canvas.drawCircle(x, y, 50, cPaint);
+			canvas.drawText("Tag "+i, x, y, tPaint);
 		}
 		return canvas;
 	}

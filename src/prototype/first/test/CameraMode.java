@@ -20,6 +20,9 @@ public class CameraMode extends Activity {
 	private boolean called = false;
 	private boolean visited = false;
 	
+	// test
+	private String testDataSet = "0.1:100!20:200!200:200";
+	
 	
 	/** Called when the activity is first created. */
     @Override
@@ -27,7 +30,8 @@ public class CameraMode extends Activity {
         super.onCreate(savedInstanceState);
         mSurface = new DrawingSurface(this);
         setContentView(mSurface);
-        
+        if(mSurface.importTargetList(testDataSet))
+        	Log.e("Import","did import data");
     }
     
     @Override
