@@ -58,6 +58,9 @@ public class DrawingSurface extends android.view.SurfaceView implements SurfaceH
 			camera = null;
 		}
 		Camera.Parameters para = camera.getParameters();
+		Log.e("Camera","camera size = "+para.getPreviewSize().height+":"+para.getPreviewSize().width);
+		Log.e("Camera","screen size = "+this.getWidth()/2+":"+this.getHeight()/2 );
+		Log.e("Camera","view angel = "+para.getHorizontalViewAngle()+":"+para.getVerticalViewAngle());
 		para.setPreviewSize(this.getWidth()/2, this.getHeight()/2);
 		camera.setParameters(para);
 		camera.startPreview();
