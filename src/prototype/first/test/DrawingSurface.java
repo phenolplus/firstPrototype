@@ -20,7 +20,7 @@ public class DrawingSurface extends android.view.SurfaceView implements SurfaceH
 	private final float[] north = {0, -90, 90};
 	private ArrayList<float[]> targetList = new ArrayList<float[]>();
 	private float[] current = new float[3];
-	private final float distance = 22;
+	private final float distance = 30;
 	
 	public DrawingSurface(Context context) {
 		super(context);
