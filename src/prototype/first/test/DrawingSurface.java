@@ -2,6 +2,7 @@ package prototype.first.test;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -18,7 +19,7 @@ public class DrawingSurface extends android.view.SurfaceView implements SurfaceH
 	private SurfaceHolder holder;
 	
 	private final float[] north = {0, -90, 90};
-	private ArrayList<float[]> targetList = new ArrayList<float[]>();
+	private ArrayList<MyPoint> targetList = new ArrayList<MyPoint>();
 	private float[] current = new float[3];
 	private final float distance = 35; // depends on device and hand
 	
@@ -61,6 +62,7 @@ public class DrawingSurface extends android.view.SurfaceView implements SurfaceH
 		Log.e("Camera","camera size = "+para.getPreviewSize().height+":"+para.getPreviewSize().width);
 		Log.e("Camera","screen size = "+this.getWidth()/2+":"+this.getHeight()/2 );
 		Log.e("Camera","view angel = "+para.getHorizontalViewAngle()+":"+para.getVerticalViewAngle());
+		
 		para.setPreviewSize(this.getWidth()/2, this.getHeight()/2);
 		camera.setParameters(para);
 		camera.startPreview();
@@ -84,7 +86,7 @@ public class DrawingSurface extends android.view.SurfaceView implements SurfaceH
 	
 	public boolean importTargetList(String list){
 		// The LIST should have the form :
-		// Lat:Long!(next)!...
+		// Name:Lat:Long!(next)!...
 		// longitude and latitude are relative
 		
 		String[] entries = list.split("!");
@@ -93,23 +95,23 @@ public class DrawingSurface extends android.view.SurfaceView implements SurfaceH
 		}
 		
 		for(int i=0;i<entries.length;i++){
-			float[] position = new float[2];
+			MyPoint target = new MyPoint();
 			String[] data = entries[i].split(":");
-			if(data.length!=2){
+			if(data.length!=3){
 				return false;
 			} else {
+				target.name = data[0];
 				float x,y;
-				x = Float.parseFloat(data[0]);
-				y = Float.parseFloat(data[1]);
+				x = Float.parseFloat(data[1]);
+				y = Float.parseFloat(data[2]);
 				if(y>0){
-					position[0] = (float) ((x>0)? Math.atan(x/y):(2*Math.PI + Math.atan(x/y)));
+					target.phi = (float) ((x>0)? Math.atan(x/y):(2*Math.PI + Math.atan(x/y)));
 				} else {
-					position[0] = (float) (Math.PI + Math.atan(x/y));
+					target.phi = (float) (Math.PI + Math.atan(x/y));
 				}
-				position[0] = (float) Math.toDegrees(position[0]);
-				position[1] = -85; // horizontal (default)
-				Log.e("Import data","added position :"+position[0]);
-				targetList.add(position);
+				target.phi = (float) Math.toDegrees(target.phi);
+				target.theta = -85; // horizontal (default)
+				targetList.add(target);
 			}
 			
 		}
@@ -152,8 +154,8 @@ public class DrawingSurface extends android.view.SurfaceView implements SurfaceH
 	
 	private Canvas showTargets(Canvas canvas){
 		Paint cPaint = new Paint();
-		cPaint.setAlpha(200);
-		cPaint.setColor(Color.RED);
+		cPaint.setColor(Color.CYAN);
+		cPaint.setAlpha(127);
 		
 		Paint tPaint = new Paint();
 		tPaint.setColor(Color.WHITE);
@@ -161,12 +163,12 @@ public class DrawingSurface extends android.view.SurfaceView implements SurfaceH
 		float x,y;
 		float[] point = new float[2];
 		for(int i=0;i<targetList.size();i++){
-			point[1] = targetList.get(i)[1] - current[1];
+			point[1] = targetList.get(i).theta - current[1];
 			if(current[0]>180){
-				point[0] = targetList.get(i)[0] - (current[0] - 360);
+				point[0] = targetList.get(i).phi - (current[0] - 360);
 				
 			} else {
-				point[0] = targetList.get(i)[0] - current[0];
+				point[0] = targetList.get(i).phi - current[0];
 				
 			}
 			point[0] = point[0]*distance;
@@ -174,9 +176,17 @@ public class DrawingSurface extends android.view.SurfaceView implements SurfaceH
 			x = this.getWidth()/2 + point[0];
 			y = this.getHeight()/2 + point[1];
 			canvas.drawCircle(x, y, 50, cPaint);
-			canvas.drawText("Tag "+i, x, y, tPaint);
+			canvas.drawText(targetList.get(i).name+i, x, y, tPaint);
 		}
 		return canvas;
+	}
+	
+	// point box
+	class MyPoint {
+		public float phi;
+		public float theta;
+		public String name;
+		
 	}
 
 }

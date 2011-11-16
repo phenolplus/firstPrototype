@@ -7,6 +7,8 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.widget.Toast;
 
 public class CameraMode extends Activity {
 	
@@ -21,7 +23,7 @@ public class CameraMode extends Activity {
 	private boolean visited = false;
 	
 	// test
-	private String testDataSet = "0.1:100!20:200!200:200";
+	private String testDataSet;
 	
 	
 	/** Called when the activity is first created. */
@@ -30,6 +32,7 @@ public class CameraMode extends Activity {
         super.onCreate(savedInstanceState);
         mSurface = new DrawingSurface(this);
         setContentView(mSurface);
+        testDataSet = ContainerBox.visablePoints;
         if(mSurface.importTargetList(testDataSet))
         	Log.e("Import","did import data");
     }
@@ -69,6 +72,15 @@ public class CameraMode extends Activity {
     	manager.registerListener(listener, sensor, SensorManager.SENSOR_DELAY_GAME);
     	called = false;
     	visited = false;
+    }
+    
+    @Override
+    public boolean onKeyDown(int keyCode,KeyEvent event){
+    	if(keyCode==KeyEvent.KEYCODE_BACK){
+    		Toast.makeText(this, "Put your device flat!", Toast.LENGTH_SHORT).show();
+    		return true;
+    	}
+    	return super.onKeyDown(keyCode, event);
     }
     
     @Override
