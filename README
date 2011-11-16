@@ -1,4 +1,22 @@
 This project contains a prototype of our game
 
+Jobs DONE:
+1. Map
+2. Points
+3. Camera
+4. Position
+
 Jobs TODO:
+1. link GPS
+2. I/O of scripts
+3. mini-games
+
+*********************** Notice ***********************
+This code has a target of Android2.2/API8
+This code is tested by Galaxy tab 10.1 running Android3.0
+There are some bug when running on 2.x devices.
+
+Major problems:
+1. distinguishing roll & pitch
+2. setting the camera resolution by program
 

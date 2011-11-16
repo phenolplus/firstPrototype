@@ -2,8 +2,6 @@ package prototype.first.test;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -176,7 +174,7 @@ public class DrawingSurface extends android.view.SurfaceView implements SurfaceH
 			x = this.getWidth()/2 + point[0];
 			y = this.getHeight()/2 + point[1];
 			canvas.drawCircle(x, y, 50, cPaint);
-			canvas.drawText(targetList.get(i).name+i, x, y, tPaint);
+			canvas.drawText(targetList.get(i).name, x, y, tPaint);
 		}
 		return canvas;
 	}
