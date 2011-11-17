@@ -107,6 +107,7 @@ public class DrawingSurface extends android.view.SurfaceView implements SurfaceH
 				} else {
 					target.phi = (float) (Math.PI + Math.atan(x/y));
 				}
+				Log.e("Points","phi = "+target.phi);
 				target.phi = (float) Math.toDegrees(target.phi);
 				target.theta = -85; // horizontal (default)
 				targetList.add(target);

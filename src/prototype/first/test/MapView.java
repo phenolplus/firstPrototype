@@ -47,8 +47,8 @@ public class MapView extends View {
 		
 		for(int i=0;i<readin.size();i++){
 			names[i+1] = readin.get(i).get("Name");
-			y[i+1] = y[0] - mag*Float.parseFloat(readin.get(i).get("Data").split(":")[1]);
-			x[i+1] = x[0] + mag*Float.parseFloat(readin.get(i).get("Data").split(":")[2]);
+			y[i+1] = y[0] - mag*Float.parseFloat(readin.get(i).get("Data").split(":")[2]);
+			x[i+1] = x[0] + mag*Float.parseFloat(readin.get(i).get("Data").split(":")[1]);
 		}
 		invalidate();
 		

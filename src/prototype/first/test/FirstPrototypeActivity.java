@@ -42,6 +42,8 @@ public class FirstPrototypeActivity extends Activity {
 	private SimpleAdapter adapter;
 	private int cursor = -1;
 	
+	private float myX = 0,myY = 0;
+	
 	private View setData;
 	private SharedPreferences savedPoints;
 	private SharedPreferences.Editor editor;
@@ -167,15 +169,15 @@ public class FirstPrototypeActivity extends Activity {
 				EditText xIn = (EditText) setData.findViewById(R.id.x_in);
 				EditText yIn = (EditText) setData.findViewById(R.id.y_in);
 				
-				String name,x,y;
+				String name;
+				float x,y;
 				name = nameIn.getText().toString();
-				x = xIn.getText().toString();
-				y = yIn.getText().toString();
+				x = Float.parseFloat(xIn.getText().toString());
+				y = Float.parseFloat(yIn.getText().toString());
 				
 				HashMap<String,String> item = new HashMap<String,String>();
-				item.put("Data", name+":"+x+":"+y);
-				item.put("Name", name);
-				item.put("Value", "x = "+x+" : y = "+y);
+				putDataToHash(item,name,x,y);
+				
 				
 				if(cursor>0){
 					pointList.add(cursor, item);
@@ -202,6 +204,7 @@ public class FirstPrototypeActivity extends Activity {
 		}
 		cursor = -1;
 	}
+	
 
 	private void readStory() {
 		Toast.makeText(this, "Nothing to say", Toast.LENGTH_SHORT).show();
@@ -209,6 +212,15 @@ public class FirstPrototypeActivity extends Activity {
 	}
 
 	/** Build up list */
+	private void putDataToHash(HashMap<String,String> item,String name, float x, float y) {
+		item.put("Data", name+":"+x+":"+y);
+		item.put("Name", name);
+		item.put("Distance", ""+Math.sqrt((Math.pow(x, 2)+Math.pow(y, 2))));
+		item.put("Value", "x = "+x+" : y = "+y);
+		item.put("xCord", ""+x);
+		item.put("yCord", ""+y);
+	}
+	
 	private void buildList() {
 		savedPoints = getSharedPreferences("PointLocationList", Context.MODE_PRIVATE);
 		String list = savedPoints.getString("LocationList", "North:10:0.1!");
@@ -221,10 +233,7 @@ public class FirstPrototypeActivity extends Activity {
 			float x,y;
 			x = Float.parseFloat(place[1]);
 			y = Float.parseFloat(place[2]);
-			item.put("Data", entries[i]);
-			item.put("Name", place[0]);
-			item.put("Distance", ""+Math.sqrt((Math.pow(x, 2)+Math.pow(y, 2))));
-			item.put("Value", "x = "+x+" : y = "+y);
+			putDataToHash(item,place[0],x,y);
 			pointList.add(item);
 		}
 		adapter = new SimpleAdapter(this, pointList, R.layout.pointitem, new String[] {"Name","Value"},new int[] {R.id.pointName,R.id.pointLocation});
@@ -261,9 +270,13 @@ public class FirstPrototypeActivity extends Activity {
 		for(int i=0;i<pointList.size();i++){
 			float range = Float.parseFloat(pointList.get(i).get("Distance"));
 			if(range<(ContainerBox.visableRange*ContainerBox.visableRange)) {
-				pass = pass + pointList.get(i).get("Data") + "!";
+				float rx,ry;
+				rx = Float.parseFloat(pointList.get(i).get("xCord")) - myX;
+				ry = Float.parseFloat(pointList.get(i).get("yCord")) - myY;
+				pass = pass + pointList.get(i).get("Name") + ":" + rx + ":" + ry + "!";
 			}
 		}
 		ContainerBox.visablePoints = pass;
+		Log.e("Pass data","Pass = "+pass);
 	}
 }
