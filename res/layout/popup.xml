@@ -9,7 +9,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="Name of Point"
-        android:textSize="30dp" />
+        android:textSize="15dp" />
 
     <EditText
         android:id="@+id/nameField"
@@ -20,7 +20,7 @@
         android:id="@+id/textView1"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:textSize="30dp"
+        android:textSize="15dp"
         android:text="Position (x,y)" />
 
     <LinearLayout

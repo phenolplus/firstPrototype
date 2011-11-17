@@ -18,6 +18,10 @@ public class CameraMode extends Activity {
 	private SensorManager manager = ContainerBox.topManager;
 	private Sensor sensor = ContainerBox.topSensor;
 	private SensorEventListener listener;
+	// fix roll range problem
+	private Sensor acc;
+	private SensorEventListener accListener;
+	
 	
 	private boolean called = false;
 	private boolean visited = false;
@@ -30,6 +34,7 @@ public class CameraMode extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        acc = manager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         mSurface = new DrawingSurface(this);
         setContentView(mSurface);
         testDataSet = ContainerBox.visablePoints;
@@ -72,21 +77,33 @@ public class CameraMode extends Activity {
     	manager.registerListener(listener, sensor, SensorManager.SENSOR_DELAY_GAME);
     	called = false;
     	visited = false;
+    	
+    	accListener = new SensorEventListener(){
+
+			@Override
+			public void onAccuracyChanged(Sensor sensor, int accuracy) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void onSensorChanged(SensorEvent event) {
+				// TODO Auto-generated method stub
+				ContainerBox.faceUp = event.values[2]<0;
+				//Log.e("Face", "aY = "+event.values[2]);
+			}
+    		
+    	};
+    	
+    	manager.registerListener(accListener, acc, SensorManager.SENSOR_DELAY_GAME);
+    	
     }
-    
-    @Override
-    public boolean onKeyDown(int keyCode,KeyEvent event){
-    	if(keyCode==KeyEvent.KEYCODE_BACK){
-    		Toast.makeText(this, "Put your device flat!", Toast.LENGTH_SHORT).show();
-    		return true;
-    	}
-    	return super.onKeyDown(keyCode, event);
-    }
-    
+        
     @Override
     public void onPause(){
     	super.onPause();
     	manager.unregisterListener(listener);
+    	manager.unregisterListener(accListener);
     	Log.e("CameraMode"," done onPause");
     }
     
@@ -94,6 +111,16 @@ public class CameraMode extends Activity {
     public void onDestroy(){
     	super.onDestroy();
     	Log.e("CameraMode"," done onDestroy");
+    }
+    
+    /** Key control */
+    @Override
+    public boolean onKeyDown(int keyCode,KeyEvent event){
+    	if(keyCode==KeyEvent.KEYCODE_BACK){
+    		Toast.makeText(this, "Put your device flat!", Toast.LENGTH_SHORT).show();
+    		return true;
+    	}
+    	return super.onKeyDown(keyCode, event);
     }
     
    

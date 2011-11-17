@@ -82,7 +82,7 @@ public class MapView extends View {
 		blue.setStrokeWidth(8);
 		
 		// radar
-		canvas.drawCircle(cw, ch, ContainerBox.visableRange, white);
+		canvas.drawCircle(cw, ch, ContainerBox.visableRange*mag, white);
 		canvas.drawText("Radar Mode ! White circle is visable range.", 30, 30, white);
 		
 		// links

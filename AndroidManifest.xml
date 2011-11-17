@@ -22,6 +22,7 @@
             </intent-filter>
         </activity>
         <activity android:name="CameraMode"  android:screenOrientation="landscape"></activity>
+        <activity android:name="MapMode"></activity>
     </application>
 
 </manifest>
