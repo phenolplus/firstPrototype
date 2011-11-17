@@ -53,7 +53,7 @@ public class CameraMode extends Activity {
 			public void onSensorChanged(SensorEvent event) {
 				// TODO Auto-generated method stub
 				mSurface.setCurrentFace(event.values);
-				float para = event.values[1];
+				float para = ContainerBox.isTab?event.values[1]:event.values[2];
 				
 				if(Math.abs(para)>50){
 					visited = true;

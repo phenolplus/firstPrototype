@@ -11,6 +11,7 @@ public final class ContainerBox {
 	public static SensorManager topManager;
 	public static Sensor topSensor;
 	public static String visablePoints;
+	public static boolean isTab = false;
 	
 	// constant
 	public static final float visableRange = 200;

@@ -2,11 +2,14 @@ package prototype.first.test;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.hardware.Camera;
+import android.hardware.Camera.Size;
 import android.util.Log;
 import android.view.SurfaceHolder;
 
@@ -23,7 +26,7 @@ public class DrawingSurface extends android.view.SurfaceView implements SurfaceH
 	
 	public DrawingSurface(Context context) {
 		super(context);
-		current = north;
+		
 		this.setWillNotDraw(false);
 		holder = this.getHolder();
 		holder.addCallback(this);
@@ -61,7 +64,19 @@ public class DrawingSurface extends android.view.SurfaceView implements SurfaceH
 		Log.e("Camera","screen size = "+this.getWidth()/2+":"+this.getHeight()/2 );
 		Log.e("Camera","view angel = "+para.getHorizontalViewAngle()+":"+para.getVerticalViewAngle());
 		
-		para.setPreviewSize(this.getWidth()/2, this.getHeight()/2);
+		List<Size> sizeList = para.getSupportedPreviewSizes();
+		for(int i=0;i<sizeList.size();i++){
+			int avaliableX,avaliableY;
+			avaliableX = sizeList.get(i).width;
+			avaliableY = sizeList.get(i).height;
+			Log.e("Avaliable Size",sizeList.get(i).width+":"+sizeList.get(i).height);
+
+			if(avaliableX*this.getHeight() == this.getWidth()*avaliableY) {
+				para.setPreviewSize(avaliableX, avaliableY);
+				break;
+			}
+			
+		}
 		camera.setParameters(para);
 		camera.startPreview();
 		Log.e("Surface","   did created");
@@ -79,8 +94,10 @@ public class DrawingSurface extends android.view.SurfaceView implements SurfaceH
 	
 	/** Importing data */
 	public void setCurrentFace(float[] direction){
-		current = direction;
-	}
+		current[0] = direction[0];
+		current[1] = ContainerBox.isTab?direction[1]:direction[2];
+		current[2] = ContainerBox.isTab?direction[2]:direction[1];
+		}
 	
 	public boolean importTargetList(String list){
 		// The LIST should have the form :
@@ -147,7 +164,8 @@ public class DrawingSurface extends android.view.SurfaceView implements SurfaceH
 		paint.setColor(Color.WHITE);
 		canvas.drawText("N", x, y, paint);
 		
-		//Log.e("Canvas","update data @ x = "+x+"  "+"y = "+y);
+		//Log.e("Canvas","update current @ x = "+current[0]+"  "+"y = "+current[1]);
+		//Log.e("Canvas","update point @ x = "+north[0]+"  "+"y = "+north[1]);
 		return canvas;
 	}
 	

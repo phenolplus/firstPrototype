@@ -13,6 +13,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -54,7 +55,10 @@ public class FirstPrototypeActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-
+		
+		ContainerBox.isTab = (Build.VERSION.SDK_INT > 10);
+		Log.e("Version","APL level = "+Build.VERSION.SDK_INT);
+		
 		mapView = (MapView) findViewById(R.id.mapView);
 		pointListView = (ListView) findViewById(R.id.listView);
 
@@ -88,7 +92,7 @@ public class FirstPrototypeActivity extends Activity {
 				public void onSensorChanged(SensorEvent event) {
 					// TODO Auto-generated method stub
 
-					float para = event.values[1];
+					float para = ContainerBox.isTab?event.values[1]:event.values[2];
 					if (Math.abs(para) > 45 && !called) {
 						called = true;
 						Intent intent = new Intent();
