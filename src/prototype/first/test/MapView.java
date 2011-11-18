@@ -84,9 +84,10 @@ public class MapView extends View {
 		// radar
 		canvas.drawCircle(cw, ch, ContainerBox.visableRange*mag, white);
 		canvas.drawText("Radar Mode ! White circle is visable range.", 30, 30, white);
+		canvas.drawLines(new float[] {50, 100, 50, 50, 50 ,50, 60, 60}, 0, 8, white);
 		
 		// links
-		for(int i=0;i<(num-1);i++){
+		for(int i=1;i<(num-1);i++){
 			canvas.drawLine(x[i], y[i], x[i+1], y[i+1], blue);
 		}
 		

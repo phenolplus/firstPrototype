@@ -29,6 +29,9 @@ import android.widget.AdapterView.OnItemClickListener;
 
 public class MapMode extends Activity {
 	/** Members */
+	private String stageID = ContainerBox.playingStageID;
+	private String stage;
+	
 	private SensorManager manager;
 	private Sensor sensor;
 	private SensorEventListener listener;
@@ -72,7 +75,8 @@ public class MapMode extends Activity {
 		mapView.setCenter(this.getWindowManager().getDefaultDisplay().getWidth()*3/4
 				,this.getWindowManager().getDefaultDisplay().getHeight()*3/4);
 		mapView.readMap(pointList);
-		Log.e("MapView",""+this.getWindowManager().getDefaultDisplay().getWidth()+" : "+this.getWindowManager().getDefaultDisplay().getHeight());
+		
+		freshTitle();
 	}
 	
 	/** System works */
@@ -93,7 +97,10 @@ public class MapMode extends Activity {
 					// TODO Auto-generated method stub
 
 					float para = ContainerBox.isTab?event.values[1]:event.values[2];
-					if (Math.abs(para) > 45 && !called) {
+					if (Math.abs(para) > 45 && !called &&!ContainerBox.modifyable) {
+						// check for initial state
+						// check for repeating call (one intent allowed)
+						// check if playing (modify mode doesn't go camera)
 						called = true;
 						Intent intent = new Intent();
 						intent.setClass(MapMode.this,CameraMode.class);
@@ -121,23 +128,51 @@ public class MapMode extends Activity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		super.onCreateOptionsMenu(menu);
-		menu.add("Add Next");
-		menu.add("Read");
-		menu.add("Delete");
+		if (ContainerBox.modifyable) {
+			menu.add(1, 0, 1, "Edit Name");
+			menu.add(1, 1, 4, "Add Next Point");
+			menu.add(1, 2, 3, "Edit Story");
+			menu.add(1, 3, 5, "Delete Point"); 
+			menu.add(1, 4, 2, "Edit Description");
+		} else {
+			menu.add(2, 0, 0, "Read Story");
+			menu.add(2, 1, 0, "Set Center Point");
+		}
 		return true;
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		super.onOptionsItemSelected(item);
-		if (item.getTitle().toString().contentEquals("Add Next")) {
-			addNewPoint();
-		}
-		if (item.getTitle().toString().contentEquals("Read")) {
-			readStory();
-		}
-		if (item.getTitle().toString().contentEquals("Delete")) {
-			deletePoint();
+		if (item.getGroupId()==1) {
+			switch (item.getItemId()) {
+			case 0:
+				editName();
+				break;
+			case 1:
+				addNewPoint();
+				break;
+			case 2:
+				editStory();
+				break;
+			case 3:
+				deletePoint();
+				break;
+			case 4:
+				editDescription();
+				break;
+			default :
+			}
+		} else {
+			switch (item.getItemId()) {
+			case 0:
+				readStory();
+				break;
+			case 1:
+				setCurrentPointCenter();
+				break;
+			default :
+			}
 		}
 		return true;
 	}
@@ -213,6 +248,92 @@ public class MapMode extends Activity {
 		Toast.makeText(this, "Nothing to say", Toast.LENGTH_SHORT).show();
 		cursor = -1;
 	}
+	
+	private void editName() {
+		LayoutInflater flat = this.getLayoutInflater();
+		setData = flat.inflate(R.layout.addnew, null);
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle("Change Map Name into :");
+		builder.setView(setData);
+		EditText nameField = (EditText) setData.findViewById(R.id.name_ip);
+		nameField.setHint(stage);
+		
+		builder.setNegativeButton("Cancel",
+				new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						// TODO Auto-generated method stub
+
+					}
+
+				});
+
+		builder.setPositiveButton("Set", new DialogInterface.OnClickListener() {
+
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// TODO Auto-generated method stub
+				EditText nameField = (EditText) setData.findViewById(R.id.name_ip);
+				String name = nameField.getText().toString();
+				name = name.contentEquals("")?stage:name;
+				
+				savedPoints = getSharedPreferences(stageID, Context.MODE_PRIVATE);
+				editor = savedPoints.edit();
+				
+				editor.putString("Name", name);
+				editor.commit();
+				MapMode.this.freshTitle();
+			}
+		});
+		builder.show();
+	}
+	
+	private void editStory() {
+		
+	}
+	
+	private void setCurrentPointCenter() {
+		
+	}
+	
+	private void editDescription() {
+		LayoutInflater flat = this.getLayoutInflater();
+		setData = flat.inflate(R.layout.addnew, null);
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle("Add Breif Discription :");
+		builder.setView(setData);
+		
+		builder.setNegativeButton("Cancel",
+				new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						// TODO Auto-generated method stub
+
+					}
+
+				});
+
+		builder.setPositiveButton("Set", new DialogInterface.OnClickListener() {
+
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// TODO Auto-generated method stub
+				EditText nameField = (EditText) setData.findViewById(R.id.name_ip);
+				String des = nameField.getText().toString();
+				
+				savedPoints = getSharedPreferences(stageID, Context.MODE_PRIVATE);
+				editor = savedPoints.edit();
+				
+				editor.putString("Description", des);
+				editor.commit();
+			}
+		});
+		builder.show();
+	}
 
 	/** Build up list */
 	private void putDataToHash(HashMap<String,String> item,String name, float x, float y) {
@@ -225,7 +346,7 @@ public class MapMode extends Activity {
 	}
 	
 	private void buildList() {
-		savedPoints = getSharedPreferences("PointLocationList", Context.MODE_PRIVATE);
+		savedPoints = getSharedPreferences(stageID, Context.MODE_PRIVATE);
 		String list = savedPoints.getString("LocationList", "North:0.01:10!");
 		
 		String[] entries = list.split("!");
@@ -258,7 +379,7 @@ public class MapMode extends Activity {
 	private void saveList() {
 		// store list
 		String write = "";
-		savedPoints = getSharedPreferences("PointLocationList",Context.MODE_PRIVATE);
+		savedPoints = getSharedPreferences(stageID,Context.MODE_PRIVATE);
 		editor = savedPoints.edit();
 		for(int i=0;i<pointList.size();i++){
 			write = write + pointList.get(i).get("Data") + "!";
@@ -281,5 +402,11 @@ public class MapMode extends Activity {
 		}
 		ContainerBox.visablePoints = pass;
 		Log.e("Pass data","Pass = "+pass);
+	}
+	
+	private void freshTitle() {
+		stage = getSharedPreferences(stageID, Context.MODE_PRIVATE).getString("Name", "John Doe");
+		
+		setTitle("Map : "+stage+(ContainerBox.modifyable?" = Modify Mode":""));
 	}
 }

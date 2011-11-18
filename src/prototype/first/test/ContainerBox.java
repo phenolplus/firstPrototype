@@ -14,6 +14,9 @@ public final class ContainerBox {
 	public static boolean isTab = false;
 	public static boolean faceUp = true;
 	
+	public static String playingStageID;
+	public static boolean modifyable=false;
+	
 	// constant
 	public static final float visableRange = 20;
 }
