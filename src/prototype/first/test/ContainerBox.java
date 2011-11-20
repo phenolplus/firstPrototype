@@ -17,7 +17,10 @@ public final class ContainerBox {
 	public static String playingStageID;
 	public static boolean modifyable=false;
 	
+	public static String mapCenterCord;
+	public static String currentCord;
+	
 	// constant
 	public static final float visableRange = 30;
-	public static float meterPerPixel = 2;
+	public static float meterPerPixel = (float)0.5;
 }

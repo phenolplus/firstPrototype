@@ -21,6 +21,7 @@ public class MapView extends View {
 	
 	private static final float mag = ContainerBox.meterPerPixel; // one pixel = 10 meters
 	private static final float deg_index = 100000; // longitude/latitude degree to meter
+	private static final float ruler = 100/mag; //m
 	
 	public MapView(Context context) {
 		super(context);
@@ -66,6 +67,8 @@ public class MapView extends View {
 	public void setCurrentLocation(float currentX, float currentY) {
 		myX = currentX;
 		myY = currentY;
+		x[0] = myX*deg_index/mag + viewCenterw;
+		y[0] = -myY*deg_index/mag + viewCenterh;
 		invalidate();
 	}
 	
@@ -92,11 +95,33 @@ public class MapView extends View {
 		blue.setStrokeWidth(8);
 		
 		// radar
-		canvas.drawCircle(x[0], y[0], ContainerBox.visableRange/mag, white);
-		canvas.drawText("Radar Mode ! White circle is visable range.", 30, 30, white);
-		canvas.drawText("Visable range = "+ContainerBox.visableRange, 30, 45, white);
-		canvas.drawText("Scale = "+ContainerBox.meterPerPixel+" meters per pixel", 30, 60, white);
-		canvas.drawLines(new float[] {50, 150, 50, 110, 50 ,110, 60, 120}, 0, 8, white);
+		canvas.drawText("Radar Mode ! White circle is visable range.", 70, 30, white);
+		canvas.drawText("Visable range = "+ContainerBox.visableRange, 70, 45, white);
+		canvas.drawText("Scale = "+ContainerBox.meterPerPixel+" meters per pixel", 70, 60, white);
+
+		canvas.drawText("Current Center = "+ContainerBox.mapCenterCord, 70, 110, white);
+		// North arrow
+		canvas.drawLines(new float[] {30, 100, 30, 50, 30 ,50, 40, 60}, 0, 8, white);
+		
+		if(!ContainerBox.modifyable) {
+			// visible range
+			canvas.drawCircle(x[0], y[0], ContainerBox.visableRange/mag, white);
+			
+			canvas.drawText("Current point = "+x[0]+":"+y[0], 70, 75, white);
+			
+			canvas.drawText("Current Location = "+ContainerBox.currentCord, 70, 95, white);
+		} else {
+			// box
+			canvas.drawLine(viewCenterw-ruler/2, viewCenterh-ruler/2, viewCenterw+ruler/2, viewCenterh-ruler/2,white);
+			canvas.drawLine(viewCenterw+ruler/2, viewCenterh-ruler/2, viewCenterw+ruler/2, viewCenterh+ruler/2,white);
+			canvas.drawLine(viewCenterw+ruler/2, viewCenterh+ruler/2, viewCenterw-ruler/2, viewCenterh+ruler/2,white);
+			canvas.drawLine(viewCenterw-ruler/2, viewCenterh+ruler/2, viewCenterw-ruler/2, viewCenterh-ruler/2,white);
+			
+			canvas.drawLine(viewCenterw-10, viewCenterh-10, viewCenterw+10, viewCenterh+10,white);
+			canvas.drawLine(viewCenterw-10, viewCenterh+10, viewCenterw+10, viewCenterh-10,white);
+			
+			canvas.drawText("The box is "+ruler*mag+" meters large", 70, 130, white);
+		}
 		
 		// links
 		for(int i=1;i<(num-1);i++){
@@ -104,7 +129,7 @@ public class MapView extends View {
 		}
 		
 		// points
-		for(int i=0;i<num;i++){
+		for(int i=ContainerBox.modifyable?1:0;i<num;i++){
 			canvas.drawCircle(x[i], y[i], 10, (i==0)?self:tar);
 		}
 		

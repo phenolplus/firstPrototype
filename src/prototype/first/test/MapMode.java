@@ -80,8 +80,7 @@ public class MapMode extends Activity {
 		
 		// set up location
 		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		mapCX = savedPoints.getFloat("mapCenterX", 0);
-		mapCY = savedPoints.getFloat("mapCenterY", 0);
+		loadGPSData();
 		
 		buildList();
 		mapView.setViewCenter(this.getWindowManager().getDefaultDisplay().getWidth()*3/4
@@ -140,7 +139,9 @@ public class MapMode extends Activity {
 					myX = (float)location.getLatitude() - mapCX;
 					myY = (float)location.getLongitude() - mapCY;
 					mapView.setCurrentLocation(myX,myY);
+					
 					Log.e("GPS something"," myX = "+myX+" myY = "+myY);
+					ContainerBox.currentCord = (float)location.getLatitude()+" : "+(float)location.getLongitude();
 				}
 
 				@Override
@@ -402,6 +403,8 @@ public class MapMode extends Activity {
 		editor.putFloat("mapCenterY", mapCY);
 		
 		editor.commit();
+		
+		ContainerBox.mapCenterCord = nowX+":"+nowY;
 		Log.e("GPS something"," mapCX = "+mapCX+" mapCY = "+mapCY);
 	}
 	
@@ -514,5 +517,13 @@ public class MapMode extends Activity {
 		stage = getSharedPreferences(stageID, Context.MODE_PRIVATE).getString("Name", "John Doe");
 		String statusBar = (!ContainerBox.modifyable? "":(" = Modify Mode  " + "current cursor = "+cursor));
 		setTitle("Map : "+stage+statusBar);
+	} 
+	
+	private void loadGPSData() {
+		mapCX = savedPoints.getFloat("mapCenterX", 0);
+		mapCY = savedPoints.getFloat("mapCenterY", 0);
+		
+		Log.e("GPS something","Load initial center"+mapCX+":"+mapCY);
+		ContainerBox.mapCenterCord = mapCX+" : "+mapCY;
 	}
 }
