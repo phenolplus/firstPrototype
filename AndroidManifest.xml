@@ -5,9 +5,13 @@
     android:versionName="1.0" >
 
     <uses-sdk android:minSdkVersion="8" />
-    <uses-feature android:required="true" android:name="android.hardware.sensor.orientation"/>
+
     <uses-permission android:name="android.permission.CAMERA" />
- 	<uses-feature android:name="android.hardware.camera" android:required="true"/>
+ 	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+ 	
+ 	<uses-feature android:required="true" android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-feature android:name="android.hardware.camera" android:required="true"/>
+ 	<uses-feature android:required="true" android:name="android.hardware.sensor.orientation"/>
     
     <application
         android:icon="@drawable/icon_one"

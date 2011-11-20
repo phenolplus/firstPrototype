@@ -13,6 +13,9 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -46,12 +49,14 @@ public class MapMode extends Activity {
 	private int cursor = -1;
 	
 	private float myX = 0,myY = 0;
+	private float mapCX,mapCY;
 	
 	private View setData;
 	private SharedPreferences savedPoints;
 	private SharedPreferences.Editor editor;
 	
-	
+	private LocationManager locationManager;
+	private LocationListener locationListener;
 	
 	/** Called when the activity is first created. */
 	@Override
@@ -64,15 +69,22 @@ public class MapMode extends Activity {
 		
 		mapView = (MapView) findViewById(R.id.mapView);
 		pointListView = (ListView) findViewById(R.id.listView);
-
+		
+		savedPoints = getSharedPreferences(stageID, Context.MODE_PRIVATE);
+		
 		// set up sensors
 		manager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 		sensor = manager.getDefaultSensor(Sensor.TYPE_ORIENTATION);
 		ContainerBox.topManager = manager;
 		ContainerBox.topSensor = sensor;
 		
+		// set up location
+		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+		mapCX = savedPoints.getFloat("mapCenterX", 0);
+		mapCY = savedPoints.getFloat("mapCenterY", 0);
+		
 		buildList();
-		mapView.setCenter(this.getWindowManager().getDefaultDisplay().getWidth()*3/4
+		mapView.setViewCenter(this.getWindowManager().getDefaultDisplay().getWidth()*3/4
 				,this.getWindowManager().getDefaultDisplay().getHeight()*3/4);
 		mapView.readMap(pointList);
 		
@@ -83,7 +95,9 @@ public class MapMode extends Activity {
 	@Override
 	public void onResume() {
 		super.onResume();
-		if (sensor != null) {
+		
+		// orientation sensor
+		if (sensor != null && !ContainerBox.modifyable) {
 			listener = new SensorEventListener() {
 
 				@Override
@@ -97,7 +111,7 @@ public class MapMode extends Activity {
 					// TODO Auto-generated method stub
 
 					float para = ContainerBox.isTab?event.values[1]:event.values[2];
-					if (Math.abs(para) > 45 && !called &&!ContainerBox.modifyable) {
+					if (Math.abs(para) > 45 && !called ) {
 						// check for initial state
 						// check for repeating call (one intent allowed)
 						// check if playing (modify mode doesn't go camera)
@@ -115,12 +129,52 @@ public class MapMode extends Activity {
 					SensorManager.SENSOR_DELAY_GAME);
 			called = false;
 		}
+		
+		// location manager
+		if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) && !ContainerBox.modifyable){
+			locationListener = new LocationListener() {
+
+				@Override
+				public void onLocationChanged(Location location) {
+					// TODO Auto-generated method stub
+					myX = (float)location.getLatitude() - mapCX;
+					myY = (float)location.getLongitude() - mapCY;
+					mapView.setCurrentLocation(myX,myY);
+					Log.e("GPS something"," myX = "+myX+" myY = "+myY);
+				}
+
+				@Override
+				public void onProviderDisabled(String provider) {
+					// TODO Auto-generated method stub
+					Log.e("GPS something","Provider disabled");
+				}
+
+				@Override
+				public void onProviderEnabled(String provider) {
+					// TODO Auto-generated method stub
+					Log.e("GPS something","Provider enabled");
+				}
+
+				@Override
+				public void onStatusChanged(String provider, int status,
+						Bundle extras) {
+					// TODO Auto-generated method stub
+					Log.e("GPS something"," status changed");
+				}
+				
+			};
+			Log.e("GPS something"," Did requested");
+			locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 0, locationListener);
+		}
 	}
 
 	@Override
 	public void onPause() {
 		super.onPause();
-		manager.unregisterListener(listener);
+		if(!ContainerBox.modifyable) {
+			manager.unregisterListener(listener);
+			locationManager.removeUpdates(locationListener);
+		}
 		saveList();
 	}
 
@@ -245,7 +299,8 @@ public class MapMode extends Activity {
 	
 
 	private void readStory() {
-		Toast.makeText(this, "Nothing to say", Toast.LENGTH_SHORT).show();
+		savedPoints = getSharedPreferences(stageID, Context.MODE_PRIVATE);
+		Toast.makeText(this, savedPoints.getString("Story", "Empty"), Toast.LENGTH_SHORT).show();
 		cursor = -1;
 	}
 	
@@ -291,11 +346,63 @@ public class MapMode extends Activity {
 	}
 	
 	private void editStory() {
+		LayoutInflater flat = this.getLayoutInflater();
+		setData = flat.inflate(R.layout.addnew, null);
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle("Edit Story :");
+		builder.setView(setData);
 		
+		savedPoints = getSharedPreferences(stageID, Context.MODE_PRIVATE);
+		EditText storyField = (EditText) setData.findViewById(R.id.name_ip);
+		storyField.setText(savedPoints.getString("Story", "New Story ..."));
+		storyField.setMaxLines(5);
+		
+		builder.setNegativeButton("Cancel",
+				new DialogInterface.OnClickListener() {
+
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						// TODO Auto-generated method stub
+
+					}
+
+				});
+
+		builder.setPositiveButton("Finish", new DialogInterface.OnClickListener() {
+
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				// TODO Auto-generated method stub
+				EditText storyField = (EditText) setData.findViewById(R.id.name_ip);
+				String story = storyField.getText().toString();
+				
+				savedPoints = getSharedPreferences(stageID, Context.MODE_PRIVATE);
+				editor = savedPoints.edit();
+				
+				editor.putString("Story", story);
+				editor.commit();
+			}
+		});
+		builder.show();
 	}
 	
 	private void setCurrentPointCenter() {
+		float nowX,nowY;
+		nowX = (float) locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLatitude();
+		nowY = (float) locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLongitude();
 		
+		mapCX = nowX;
+		mapCY = nowY;
+		
+		savedPoints = getSharedPreferences(stageID, Context.MODE_PRIVATE);
+		editor = savedPoints.edit();
+		
+		editor.putFloat("mapCenterX", mapCX);
+		editor.putFloat("mapCenterY", mapCY);
+		
+		editor.commit();
+		Log.e("GPS something"," mapCX = "+mapCX+" mapCY = "+mapCY);
 	}
 	
 	private void editDescription() {
@@ -339,7 +446,6 @@ public class MapMode extends Activity {
 	private void putDataToHash(HashMap<String,String> item,String name, float x, float y) {
 		item.put("Data", name+":"+x+":"+y);
 		item.put("Name", name);
-		item.put("Distance", ""+Math.sqrt((Math.pow(x, 2)+Math.pow(y, 2))));
 		item.put("Value", "x = "+x+" : y = "+y);
 		item.put("xCord", ""+x);
 		item.put("yCord", ""+y);
@@ -347,7 +453,7 @@ public class MapMode extends Activity {
 	
 	private void buildList() {
 		savedPoints = getSharedPreferences(stageID, Context.MODE_PRIVATE);
-		String list = savedPoints.getString("LocationList", "North:0.01:10!");
+		String list = savedPoints.getString("LocationList", "North:0.01:1000!");
 		
 		String[] entries = list.split("!");
 		
@@ -392,11 +498,11 @@ public class MapMode extends Activity {
 	private void quickPass(){
 		String pass = "";
 		for(int i=0;i<pointList.size();i++){
-			float range = Float.parseFloat(pointList.get(i).get("Distance"));
+			float rx,ry;
+			rx = Float.parseFloat(pointList.get(i).get("xCord")) - myX;
+			ry = Float.parseFloat(pointList.get(i).get("yCord")) - myY;
+			float range = rx*rx + ry*ry;
 			if(range<(ContainerBox.visableRange*ContainerBox.visableRange)) {
-				float rx,ry;
-				rx = Float.parseFloat(pointList.get(i).get("xCord")) - myX;
-				ry = Float.parseFloat(pointList.get(i).get("yCord")) - myY;
 				pass = pass + pointList.get(i).get("Name") + ":" + rx + ":" + ry + "!";
 			}
 		}
@@ -406,7 +512,7 @@ public class MapMode extends Activity {
 	
 	private void freshTitle() {
 		stage = getSharedPreferences(stageID, Context.MODE_PRIVATE).getString("Name", "John Doe");
-		
-		setTitle("Map : "+stage+(ContainerBox.modifyable?" = Modify Mode":""));
+		String statusBar = (!ContainerBox.modifyable? "":(" = Modify Mode  " + "current cursor = "+cursor));
+		setTitle("Map : "+stage+statusBar);
 	}
 }

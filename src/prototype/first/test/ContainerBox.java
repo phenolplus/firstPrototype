@@ -18,5 +18,6 @@ public final class ContainerBox {
 	public static boolean modifyable=false;
 	
 	// constant
-	public static final float visableRange = 20;
+	public static final float visableRange = 30;
+	public static float meterPerPixel = 2;
 }

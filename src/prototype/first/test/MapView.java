@@ -15,9 +15,12 @@ public class MapView extends View {
 	/** Members */
 	private String[] names;
 	private float[] x,y;
-	private float ch,cw;
-	private final float mag = 10;
+	private float viewCenterh,viewCenterw;
+	private float myX=0,myY=0;
 	private int num=0;
+	
+	private static final float mag = ContainerBox.meterPerPixel; // one pixel = 10 meters
+	private static final float deg_index = 100000; // longitude/latitude degree to meter
 	
 	public MapView(Context context) {
 		super(context);
@@ -42,21 +45,28 @@ public class MapView extends View {
 		y = new float[num];
 		
 		names[0] = "Self";
-		x[0] = cw;
-		y[0] = ch;
+		x[0] = myX*deg_index/mag + viewCenterw;
+		y[0] = -myY*deg_index/mag + viewCenterh;
 		
 		for(int i=0;i<readin.size();i++){
 			names[i+1] = readin.get(i).get("Name");
-			y[i+1] = y[0] - mag*Float.parseFloat(readin.get(i).get("Data").split(":")[2]);
-			x[i+1] = x[0] + mag*Float.parseFloat(readin.get(i).get("Data").split(":")[1]);
+			x[i+1] = viewCenterw + Float.parseFloat(readin.get(i).get("Data").split(":")[1])/mag;
+			y[i+1] = viewCenterh - Float.parseFloat(readin.get(i).get("Data").split(":")[2])/mag;
 		}
 		invalidate();
 		
 	}
 	
-	public void setCenter(float w,float h){
-		ch = h/2;
-		cw = w/2;
+	public void setViewCenter(float w,float h){
+		// set center point of map
+		viewCenterh = h/2;
+		viewCenterw = w/2;
+	}
+	
+	public void setCurrentLocation(float currentX, float currentY) {
+		myX = currentX;
+		myY = currentY;
+		invalidate();
 	}
 	
 	
@@ -82,9 +92,11 @@ public class MapView extends View {
 		blue.setStrokeWidth(8);
 		
 		// radar
-		canvas.drawCircle(cw, ch, ContainerBox.visableRange*mag, white);
+		canvas.drawCircle(x[0], y[0], ContainerBox.visableRange/mag, white);
 		canvas.drawText("Radar Mode ! White circle is visable range.", 30, 30, white);
-		canvas.drawLines(new float[] {50, 100, 50, 50, 50 ,50, 60, 60}, 0, 8, white);
+		canvas.drawText("Visable range = "+ContainerBox.visableRange, 30, 45, white);
+		canvas.drawText("Scale = "+ContainerBox.meterPerPixel+" meters per pixel", 30, 60, white);
+		canvas.drawLines(new float[] {50, 150, 50, 110, 50 ,110, 60, 120}, 0, 8, white);
 		
 		// links
 		for(int i=1;i<(num-1);i++){
@@ -98,7 +110,7 @@ public class MapView extends View {
 		
 		// names
 		for(int i=1;i<num;i++){
-			canvas.drawText(names[i], x[i]+5, y[i]-5, white);
+			canvas.drawText(names[i], x[i]+10, y[i]-10, white);
 		}
 		
 		super.onDraw(canvas);
