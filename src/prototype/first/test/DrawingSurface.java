@@ -126,10 +126,11 @@ public class DrawingSurface extends android.view.SurfaceView implements SurfaceH
 				float x,y;
 				x = Float.parseFloat(data[1]);
 				y = Float.parseFloat(data[2]);
+
 				if(x>0){
-					target.phi = (float) ((y>0)? Math.atan(x/y):(Math.PI + Math.atan(x/y)));
+					target.phi = (float) ((y>=0)? Math.atan(x/y):(Math.PI + Math.atan(x/y)));
 				} else {
-					target.phi = (float) ((y>0)?(2*Math.PI + Math.atan(x/y)):(Math.PI + Math.atan(x/y)));
+					target.phi = (float) ((y>=0)?(2*Math.PI + Math.atan(x/y)):(Math.PI + Math.atan(x/y)));
 				}
 				
 				target.phi = (float) Math.toDegrees(target.phi);
