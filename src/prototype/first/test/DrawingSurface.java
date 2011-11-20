@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -24,6 +26,8 @@ public class DrawingSurface extends android.view.SurfaceView implements SurfaceH
 	private float[] current = new float[3];
 	private final float distance = ContainerBox.isTab?35:10; // depends on device and hand
 	
+	private Bitmap icon;
+	
 	public DrawingSurface(Context context) {
 		super(context);
 		
@@ -32,6 +36,8 @@ public class DrawingSurface extends android.view.SurfaceView implements SurfaceH
 		holder.addCallback(this);
 		holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 		// TODO Auto-generated constructor stub
+		
+		icon = BitmapFactory.decodeResource(getResources(), R.drawable.target);
 	}
 	
 	@Override
@@ -194,7 +200,8 @@ public class DrawingSurface extends android.view.SurfaceView implements SurfaceH
 			point[1] = point[1]*distance;
 			x = this.getWidth()/2 + point[0];
 			y = this.getHeight()/2 + point[1];
-			canvas.drawCircle(x, y, 50, cPaint);
+			//canvas.drawCircle(x, y, 50, cPaint);
+			canvas.drawBitmap(icon, x-icon.getWidth()/2, y-icon.getHeight()/2, null);
 			canvas.drawText(targetList.get(i).name, x, y, tPaint);
 		}
 		return canvas;
