@@ -136,12 +136,16 @@ public class MapMode extends Activity {
 				@Override
 				public void onLocationChanged(Location location) {
 					// TODO Auto-generated method stub
-					myX = (float)location.getLatitude() - mapCX;
-					myY = (float)location.getLongitude() - mapCY;
+					myX = (float)location.getLongitude() - mapCX;
+					myY = (float)location.getLatitude() - mapCY;
+					
+					myX = myX*ContainerBox.deg_index;
+					myY = myY*ContainerBox.deg_index;
+					
 					mapView.setCurrentLocation(myX,myY);
 					
 					Log.e("GPS something"," myX = "+myX+" myY = "+myY);
-					ContainerBox.currentCord = (float)location.getLatitude()+" : "+(float)location.getLongitude();
+					ContainerBox.currentCord = (float)location.getLongitude()+" : "+(float)location.getLatitude();
 				}
 
 				@Override
@@ -390,8 +394,8 @@ public class MapMode extends Activity {
 	
 	private void setCurrentPointCenter() {
 		float nowX,nowY;
-		nowX = (float) locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLatitude();
-		nowY = (float) locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLongitude();
+		nowX = (float) locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLongitude();
+		nowY = (float) locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLatitude();
 		
 		mapCX = nowX;
 		mapCY = nowY;

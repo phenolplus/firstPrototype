@@ -20,7 +20,6 @@ public class MapView extends View {
 	private int num=0;
 	
 	private static final float mag = ContainerBox.meterPerPixel; // one pixel = 10 meters
-	private static final float deg_index = 100000; // longitude/latitude degree to meter
 	private static final float ruler = 100/mag; //m
 	
 	public MapView(Context context) {
@@ -46,8 +45,8 @@ public class MapView extends View {
 		y = new float[num];
 		
 		names[0] = "Self";
-		x[0] = myX*deg_index/mag + viewCenterw;
-		y[0] = -myY*deg_index/mag + viewCenterh;
+		x[0] = myX/mag + viewCenterw;
+		y[0] = -myY/mag + viewCenterh;
 		
 		for(int i=0;i<readin.size();i++){
 			names[i+1] = readin.get(i).get("Name");
@@ -67,8 +66,8 @@ public class MapView extends View {
 	public void setCurrentLocation(float currentX, float currentY) {
 		myX = currentX;
 		myY = currentY;
-		x[0] = myX*deg_index/mag + viewCenterw;
-		y[0] = -myY*deg_index/mag + viewCenterh;
+		x[0] = myX/mag + viewCenterw;
+		y[0] = -myY/mag + viewCenterh;
 		invalidate();
 	}
 	
@@ -110,6 +109,12 @@ public class MapView extends View {
 			canvas.drawText("Current point = "+x[0]+":"+y[0], 70, 75, white);
 			
 			canvas.drawText("Current Location = "+ContainerBox.currentCord, 70, 95, white);
+			
+			canvas.drawLine(viewCenterw-ruler/2, viewCenterh, viewCenterw+ruler/2, viewCenterh,white);
+			canvas.drawLine(viewCenterw-ruler/2, viewCenterh-10, viewCenterw-ruler/2, viewCenterh+10,white);
+			canvas.drawLine(viewCenterw+ruler/2, viewCenterh-10, viewCenterw+ruler/2, viewCenterh+10,white);
+			canvas.drawText(ruler*mag+" m", viewCenterw+ruler/2+10, viewCenterh+20, white);
+			
 		} else {
 			// box
 			canvas.drawLine(viewCenterw-ruler/2, viewCenterh-ruler/2, viewCenterw+ruler/2, viewCenterh-ruler/2,white);

@@ -23,4 +23,5 @@ public final class ContainerBox {
 	// constant
 	public static final float visableRange = 30;
 	public static float meterPerPixel = (float)0.5;
+	public static final float deg_index = 100000; // longitude/latitude degree to meter
 }
